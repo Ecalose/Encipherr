@@ -6,7 +6,7 @@
 
  
   <p align="center">
-    Free online encryption and decryption tool.
+    Open-source online AES encryption, decryption, and PNG steganography tool.
     <br>
     <a href="https://encipherr.pythonanywhere.com/"><strong> Explore Encipherr »</strong></a>
   </p>
