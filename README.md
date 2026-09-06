@@ -47,13 +47,19 @@
 
 ## About The Project
 
-<!-- [![screenshot](screenshot.png)](https://encipherr.pythonanywhere.com/) -->
 <a href="https://encipherr.pythonanywhere.com/"><img src="images/scrn_1.png" width="200" />  <img src="images/scrn_2.png" width="200" /></a>
 
 Encipherr is a web app that provides powerful encryption of data. It is fast and free, and it is open source. It uses no ads, and it is the only easy way to encrypt your data in any web browser.
 
 Encipherr uses <a href="https://fr.wikipedia.org/wiki/Advanced_Encryption_Standard" target="_blank">AES</a> encryption algorithm. 
 AES is both fast, and cryptographically strong. It is a good default choice for encryption and it's considered one of the strongest algorithms available.  
+
+### Features
+- Encrypt and decrypt text with an AES key or custom password.
+- Encrypt and decrypt uploaded files with temporary server-side storage.
+- Hide AES-encrypted text inside PNG images using Steganography Mode.
+- Extract hidden text from a stego PNG using the same key.
+- Validate PNG format, image size, payload capacity, and hidden-payload integrity.
 
 ## Usage
 Visit <a href="https://Encipherr.pythonanywhere.com/" target="_blank">Encipherr website</a> \
@@ -68,11 +74,14 @@ The project directory will contain:
 ```
 .
 ├── CHANGELOG.md
+├── images
+│   ├── scrn_1.png
+│   └── scrn_2.png
+├── implementation_plan.md
 ├── LICENSE.txt
 ├── main.py
 ├── README.md
 ├── requirements.txt
-├── screenshot.png
 └── src
     ├── app.py
     ├── config.py
@@ -90,7 +99,8 @@ The project directory will contain:
     │   │   └── egg.js
     │   ├── js
     │   │   ├── ajaxcall.js
-    │   │   └── upload.js
+    │   │   ├── upload.js
+    │   │   └── utils.js
     │   ├── pwa
     │   │   ├── 512x512-blue.png
     │   │   ├── 512x512.png
@@ -105,9 +115,8 @@ The project directory will contain:
         ├── home.html
         ├── page-404.html
         ├── page-500.html
-        └── privacy.html
-
-9 directories, 30 files
+        ├── privacy.html
+        └── steganography.html
 
 ```
 
@@ -122,13 +131,14 @@ then run the server by typing in your terminal:
 ```python
 python3 main.py
 ```
+
+Open `http://127.0.0.1:5000/home` in your browser. The Steganography page is available from the navigation bar.
+
+Steganography currently supports PNG images only. To hide a message, enter or generate a key, type the message, select a PNG image, and choose **Hide in Image**. To extract it, use the same key, select the generated PNG, and choose **Extract from Image**. The original image is not modified.
+
+For Python 3.12 environments, the included requirements use compatible versions of `greenlet`, `Pillow`, and `stegano`.
 ## CHANGELOG
 Read the latest notable changes made to a Encipherr [here](CHANGELOG.md)
-
-## TODO
-- Custom encryption key (password) (Done) :heavy_check_mark:.
-- More encryption algorithms.
-- Offline usage (semi-ready).
 
 ## Encipherr-CLI :sparkles:
 
