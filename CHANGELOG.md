@@ -1,4 +1,13 @@
 # Change Log
+## 2026-09-06
+- Added Steganography Mode for hiding AES-encrypted text inside PNG images.
+- Added PNG extraction with key validation, payload integrity checks, and clear error handling.
+- Added image capacity and safety validation to prevent unsupported or oversized images from being processed.
+- Added a dedicated Steganography page and navigation link.
+- Fixed Python 3.12 dependency compatibility by updating the greenlet package.
+
+## 2026-07-23
+- Fixed a bug where submitting Upload and Encrypt without a secret key or file could return a server error instead of a handled validation message.
 ## 2022-09-04
 - Added an option to encrypt with a <b>custom password</b> of the user choice.
 ## 2022-08-31

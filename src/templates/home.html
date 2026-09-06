@@ -29,6 +29,12 @@ Encipherr - Online Tool for AES Encryption and Decryption
            <div style="text-align:center">{{ message }}</div>
        </div>
        {% endfor %}
+       {% if error_message %}
+       <div class="alert alert-warning">
+         <button type="button" class="close" data-dismiss="alert">&times;</button>
+         <div style="text-align:center">{{ error_message }}</div>
+       </div>
+       {% endif %}
   </div>
   
   <hr style="width:100%;margin-bottom:16px;margin-top:0"/>

@@ -13,8 +13,10 @@ app.config['SESSION_SQLALCHEMY'] = db
 
 Session(app)
 
-db.create_all()
-db.session.commit()
+# Run inside app context
+with app.app_context():
+    db.create_all()
+    db.session.commit()
 
 from .modules import *
 from .routes import *

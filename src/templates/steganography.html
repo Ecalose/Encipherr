@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Encipherr - Steganography Mode
+{% endblock title %}
+
+{% block description %}"Hide and extract encrypted text inside PNG images"{% endblock description %}
+
+{% block content %}
+
+<div class="container">
+  <p id="intro" class="text-center">Steganography Mode</p>
+
+  <div class="container">
+       {% for message in get_flashed_messages() %}
+       <div class="alert alert-warning">
+           <button type="button" class="close" data-dismiss="alert">&times;</button>
+           <div style="text-align:center">{{ message }}</div>
+       </div>
+       {% endfor %}
+       {% if error_message %}
+       <div class="alert alert-warning">
+         <button type="button" class="close" data-dismiss="alert">&times;</button>
+         <div style="text-align:center">{{ error_message }}</div>
+       </div>
+       {% endif %}
+       {% if success_message %}
+       <div class="alert alert-success">
+         <button type="button" class="close" data-dismiss="alert">&times;</button>
+         <div style="text-align:center">{{ success_message }}</div>
+       </div>
+       {% endif %}
+  </div>
+
+  <hr style="width:100%;margin-bottom:16px;margin-top:0"/>
+
+  <form id="form" action="#" method="POST" enctype="multipart/form-data">
+
+    <h4 class="title">Enter Secret Key </h4>
+
+    <p><input id="key" type="text" name="key" value="{{key}}" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm" placeholder="Key of the encryption" /></p>
+    <p>
+    <div class="form-check">
+      <input id="aes" class="form-check-input" type="radio" name="key_type" value="aes" checked>
+      <label class="form-check-label" for="flexRadioDefault1">
+        32-byte key.
+      </label>
+    </div>
+    <div class="form-check">
+      <input id="pwd" class="form-check-input" type="radio" name="key_type" value="pwd">
+      <label class="form-check-label" for="flexRadioDefault2">
+        Custom Password
+      </label>
+    </div>
+    </p>
+
+    <p><b>Or</b></p>
+    <input id="btn" type="button" name="submit_b" onclick="genkey()" value="Generate Key" class="btn btn-primary genkey"/>
+    <br />
+    <br />
+
+    <h4 class="title">Hidden Message</h4>
+
+    <p><textarea id="txtarea" name="txt" class="form-control" rows="7" aria-label="Large" aria-describedby="inputGroup-sizing-sm" placeholder="Text to hide or extracted message">{{ value }}</textarea></p>
+
+    <h4 class="title">PNG Image</h4>
+
+    <label id="exampleInputFile">
+      <i>PNG only</i>
+    </label>
+    <input type="file" id="stego_file" name="stego_file" class="form-control-file" accept=".png,image/png" />
+    <br />
+    <input id="upload_btn" type="submit" name="submit_b" value="Hide in Image" class="btn btn-primary" />
+    <input id="upload_btn" type="submit" name="submit_b" value="Extract from Image" class="btn btn-primary" />
+
+    <div id="alert_wrapper"></div>
+  </form>
+
+  <br />
+  <br />
+</div>
+
+{% endblock content %}

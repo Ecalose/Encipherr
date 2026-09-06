@@ -1,9 +1,31 @@
 """ App Routing """
 
-from flask import flash,request,render_template,url_for,redirect,send_from_directory,abort,after_this_request,session
+from flask import request,render_template,url_for,redirect,send_from_directory,abort,after_this_request,session
 from .app import app
-from src.modules import TextEncryption,FileEncryption,Utils
+from src.modules import TextEncryption,FileEncryption,ImageSteganography,Utils
 import os,shutil
+
+
+def clear_download_session(path, filename):
+    """Remove a generated download file and its temp directory safely."""
+
+    if not path or path == 'not set' or not os.path.exists(path):
+        return
+
+    file_path = os.path.join(path, filename)
+
+    try:
+        if file_path and os.path.exists(file_path):
+            os.remove(file_path)
+        if app.config["ENV"] == "DEV":
+            shutil.rmtree(path, ignore_errors=True)
+        else:
+            try:
+                os.rmdir(path)
+            except OSError:
+                pass
+    except PermissionError:
+        pass
 
 @app.route('/genkey',methods=['GET'])
 def genkey():
@@ -33,43 +55,44 @@ def home():
     
     if request.method == 'POST':
         Utils.SetupGuestSession()
-        if request.form["submit_b"] == "Upload and Encrypt":
+        submit_action = request.form.get("submit_b")
+        key_value = request.form.get("key", "")
+
+        if submit_action == "Upload and Encrypt":
             try:
                 Utils.Upload_file()
                 try:
                     file = FileEncryption()
                     filename=file.encrypt()
-                except:
-                    flash('Encryption failed! , possible problem: key not found or invalid key')
+                except Exception:
                     path = session.get('path','not set')
-                    shutil.rmtree(path)
-                    return redirect(url_for('home'))  
+                    if path and os.path.exists(path):
+                        shutil.rmtree(path)
+                    return render_template('home.html', key=key_value, error_message='Encryption failed! , possible problem: key not found or invalid key')
                 
                 return redirect(url_for('getfile',file_name=filename))
-            except:
-                flash('Upload failed! , possible problem: no file to upload or key not found')
-                return redirect(url_for('home'))
+            except Exception:
+                return render_template('home.html', key=key_value, error_message='Upload failed! , possible problem: no file to upload or key not found')
 
-        elif request.form["submit_b"] == "Upload and Decrypt":
+        elif submit_action == "Upload and Decrypt":
             try:
                 Utils.Upload_file()
                 
                 try:
                     file = FileEncryption()
                     filename=file.decrypt()
-                except:
-                    flash('Decryption failed! , possible problem: key not found or invalid key')
+                except Exception:
                     path = session.get('path','not set') 
-                    shutil.rmtree(path)
-                    return redirect(url_for('home'))
+                    if path and os.path.exists(path):
+                        shutil.rmtree(path)
+                    return render_template('home.html', key=key_value, error_message='Decryption failed! , possible problem: key not found or invalid key')
                 
                 return redirect(url_for('getfile',file_name=filename))
             
-            except:
-                flash('Upload failed! , possible problem: no file to upload or key not found')
-                return render_template('home.html')
+            except Exception:
+                return render_template('home.html', key=key_value, error_message='Upload failed! , possible problem: no file to upload or key not found')
         else:
-            return render_template('home.html')
+            return render_template('home.html', key=key_value)
 
     else:
         return render_template('home.html')
@@ -83,15 +106,9 @@ def getfile(file_name):
     try:
         @after_this_request
         def remove_file_and_dir(response):
-            if os.path.exists(path):
-                if app.config["ENV"] == "DEV":
-                    shutil.rmtree(path)
-                else:
-                    # Delete only the file without its dir to avoid 
-                    # OSError: [Errno 16] Device or resource busy: '.nfs0000000005..' prod error.
-                    os.remove(os.path.join(path,filename))
-            session.pop('path')
-            session.pop('filename')
+            session.pop('path', None)
+            session.pop('filename', None)
+            response.call_on_close(lambda: clear_download_session(path, filename))
             
             return response
 
@@ -121,6 +138,39 @@ def about():
 @app.route("/privacy")
 def privacy():
     return render_template('privacy.html')
+
+@app.route('/steganography',methods=['POST','GET'])
+def steganography():
+    """Handle PNG steganography encode and extract requests"""
+
+    if request.method == 'POST':
+        Utils.SetupGuestSession()
+        submit_action = request.form.get("submit_b")
+        key_value = request.form.get("key", "")
+        text_value = request.form.get("txt", "")
+
+        if submit_action == "Hide in Image":
+            try:
+                stego = ImageSteganography()
+                filename = stego.hide()
+                return redirect(url_for('getfile',file_name=filename))
+            except Exception as error:
+                path = session.get('path','not set')
+                if path and os.path.exists(path):
+                    shutil.rmtree(path)
+                return render_template('steganography.html', key=key_value, value=text_value, error_message=str(error))
+
+        if submit_action == "Extract from Image":
+            try:
+                stego = ImageSteganography()
+                recovered_text = stego.extract()
+                return render_template('steganography.html', key=key_value, value=recovered_text, success_message='Hidden message extracted successfully')
+            except Exception as error:
+                return render_template('steganography.html', key=key_value, value=text_value, error_message=str(error))
+
+        return render_template('steganography.html', key=key_value, value=text_value)
+
+    return render_template('steganography.html')
 
 @app.errorhandler(404)
 def page_not_found(error):

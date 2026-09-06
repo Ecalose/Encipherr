@@ -1,11 +1,15 @@
 function HideErrorMsg() {
-    if (document.getElementById('tohide').style.display == 'block') {
-      document.getElementById('tohide').style.display = 'none';
-      }
+        var error_message = document.getElementById('tohide');
+        if (error_message && error_message.style.display == 'block') {
+            error_message.style.display = 'none';
+        }
 }
 
 function CloseMsg(){
-    document.getElementById('tohide').style.display = 'none';
+        var error_message = document.getElementById('tohide');
+        if (error_message) {
+            error_message.style.display = 'none';
+        }
 
 }
 
